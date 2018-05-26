@@ -1,7 +1,6 @@
 package com.xinput.service;
 
-import com.xinput.config.database.TargetDataSource;
-import com.xinput.entity.Person2;
+import com.xinput.entity.Demo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -10,16 +9,21 @@ import java.util.List;
 
 /**
  * @author xinput
- * @date 2017-06-25 14:59
+ * @date 2018-05-26 11:19
  */
 @Service
-public class PersonService {
+public class DemoService {
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @TargetDataSource(name = "ds2")
-    public List<Person2> query() {
-        String sql = "select * from person";
-        return jdbcTemplate.query(sql, new Person2());
+    /**
+     * 使用默认数据库demo
+     *
+     * @return
+     */
+    public List<Demo> query() {
+        String sql = "select * from demo";
+        return jdbcTemplate.query(sql, new Demo());
     }
 }

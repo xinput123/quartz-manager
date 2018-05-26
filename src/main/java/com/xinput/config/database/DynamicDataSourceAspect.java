@@ -22,6 +22,13 @@ public class DynamicDataSourceAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicDataSourceAspect.class);
 
+    /**
+     * 注解：@Before("@annotation(ds)")
+     *
+     * @param point
+     * @param ds
+     * @throws Throwable
+     */
     @Before("@annotation(ds)")
     public void changeDataSource(JoinPoint point, TargetDataSource ds) throws Throwable {
         String dsId = ds.name();
