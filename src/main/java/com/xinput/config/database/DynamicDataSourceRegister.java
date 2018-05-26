@@ -79,8 +79,6 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
      * 创建DataSource
      *
      * @return
-     * @author SHANHY
-     * @create 2016年1月24日
      */
     @SuppressWarnings("unchecked")
     public DataSource buildDataSource(Map<String, Object> dsMap) {
@@ -119,9 +117,6 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
     /**
      * 初始化主数据源
-     *
-     * @author SHANHY
-     * @create 2016年1月24日
      */
     private void initDefaultDataSource(Environment env) {
         // 读取主数据源
@@ -143,8 +138,6 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
      *
      * @param dataSource
      * @param env
-     * @author SHANHY
-     * @create 2016年1月25日
      */
     private void dataBinder(DataSource dataSource, Environment env) {
         RelaxedDataBinder dataBinder = new RelaxedDataBinder(dataSource);
@@ -169,9 +162,6 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
     /**
      * 初始化更多数据源
-     *
-     * @author SHANHY
-     * @create 2016年1月24日
      */
     private void initCustomDataSources(Environment env) {
         // 读取配置文件获取更多数据源，也可以通过defaultDataSource读取数据库获取更多数据源
