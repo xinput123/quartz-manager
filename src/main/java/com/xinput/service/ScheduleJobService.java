@@ -62,27 +62,29 @@ public class ScheduleJobService {
     }
 
     /**
-     * 根据id修改
+     * 根据id修改任务状态
      *
      * @param taskId
      * @param status
      * @return
      */
-    public int updateScheduleJobStatus(String taskId, String status) {
+    public ScheduleJob updateScheduleJobStatus(String taskId, String status) {
         ScheduleJob scheduleJob = scheduleJob(taskId);
         if (null == scheduleJob || status.equals(scheduleJob.getJobStatus())) {
-            return 0;
+            return null;
         }
 
         String updteJobStatusSql = "UPDATE schedule_task SET job_status = ? WHERE job_id = ?";
 
-        return jdbcTemplate.update(updteJobStatusSql, status, taskId);
+        jdbcTemplate.update(updteJobStatusSql, status, taskId);
+        scheduleJob.setJobStatus(status);
+        return scheduleJob;
     }
 
     /**
      * 修改cron
      */
-    public int updateScheduleJobStatu(ScheduleJob job) {
+    public int updateScheduleJobCron(ScheduleJob job) {
         ScheduleJob scheduleJob = scheduleJob(job.getJobId());
         if (null == scheduleJob || scheduleJob.getCronExpression().equals(scheduleJob.getCronExpression())) {
             return 0;
@@ -199,7 +201,7 @@ public class ScheduleJobService {
      * @param scheduleJob
      * @throws SchedulerException
      */
-    public void runAJobNow(ScheduleJob scheduleJob) throws SchedulerException {
+    public void runJobNow(ScheduleJob scheduleJob) throws SchedulerException {
         JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
         scheduler.triggerJob(jobKey);
     }
@@ -223,8 +225,7 @@ public class ScheduleJobService {
      *
      * @throws SchedulerException
      */
-    public void changeStatus(String jobId, String status) throws SchedulerException {
-        ScheduleJob job = scheduleJob(jobId);
+    public void updateJobStatus(ScheduleJob job, String status) throws SchedulerException {
         if (job == null) {
             return;
         }
