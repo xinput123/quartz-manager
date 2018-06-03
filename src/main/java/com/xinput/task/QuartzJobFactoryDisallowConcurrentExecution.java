@@ -13,7 +13,6 @@ import org.quartz.JobExecutionException;
  */
 @DisallowConcurrentExecution
 public class QuartzJobFactoryDisallowConcurrentExecution implements Job {
-//    public final Logger log = Logger.getLogger(this.getClass());
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {

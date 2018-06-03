@@ -13,9 +13,6 @@ import org.quartz.JobExecutionException;
 @DisallowConcurrentExecution
 public class QuartzJobFactory implements Job {
 
-    public QuartzJobFactory() {
-    }
-
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         ScheduleJob scheduleJob = (ScheduleJob) context.getMergedJobDataMap().get("scheduleJob");
