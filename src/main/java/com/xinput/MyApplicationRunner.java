@@ -22,8 +22,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         List<ScheduleJob> jobList = scheduleJobService.allScheduleJobs();
         System.out.println(jobList.size());
         for (ScheduleJob job : jobList) {
-            System.out.println(job.toString());
-
+            scheduleJobService.addJob(job);
         }
     }
 }

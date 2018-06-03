@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -91,6 +92,12 @@ public class ScheduleJobService {
         return jdbcTemplate.update(updteJobStatusSql, job.getCronExpression(), job.getJobId());
     }
 
+    // ================================================================================
+    // ================================================================================
+    // 定时任务的操作
+    // ================================================================================
+    // ================================================================================
+
     /**
      * 添加任务
      *
@@ -123,5 +130,117 @@ public class ScheduleJobService {
         }
     }
 
+    /**
+     * 所有正在运行的job
+     *
+     * @return
+     * @throws SchedulerException
+     */
+    public List<ScheduleJob> getRunningJob() throws SchedulerException {
+        List<JobExecutionContext> executingJobs = scheduler.getCurrentlyExecutingJobs();
+        List<ScheduleJob> jobList = new ArrayList(executingJobs.size());
+        for (JobExecutionContext executingJob : executingJobs) {
+            ScheduleJob job = new ScheduleJob();
+            JobDetail jobDetail = executingJob.getJobDetail();
+            JobKey jobKey = jobDetail.getKey();
+            Trigger trigger = executingJob.getTrigger();
+            job.setJobName(jobKey.getName());
+            job.setJobGroup(jobKey.getGroup());
+            job.setDescription("触发器:" + trigger.getKey());
+            Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
+            job.setJobStatus(triggerState.name());
+            if (trigger instanceof CronTrigger) {
+                CronTrigger cronTrigger = (CronTrigger) trigger;
+                String cronExpression = cronTrigger.getCronExpression();
+                job.setCronExpression(cronExpression);
+            }
+            jobList.add(job);
+        }
+        return jobList;
+    }
+
+    /**
+     * 暂停一个job
+     *
+     * @param scheduleJob
+     * @throws SchedulerException
+     */
+    public void pauseJob(ScheduleJob scheduleJob) throws SchedulerException {
+        JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
+        scheduler.pauseJob(jobKey);
+    }
+
+    /**
+     * 恢复一个job
+     *
+     * @param scheduleJob
+     * @throws SchedulerException
+     */
+    public void resumeJob(ScheduleJob scheduleJob) throws SchedulerException {
+        JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
+        scheduler.resumeJob(jobKey);
+    }
+
+    /**
+     * 删除一个job
+     *
+     * @param scheduleJob
+     * @throws SchedulerException
+     */
+    public void deleteJob(ScheduleJob scheduleJob) throws SchedulerException {
+        JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
+        scheduler.deleteJob(jobKey);
+
+    }
+
+    /**
+     * 立即执行job
+     *
+     * @param scheduleJob
+     * @throws SchedulerException
+     */
+    public void runAJobNow(ScheduleJob scheduleJob) throws SchedulerException {
+        JobKey jobKey = JobKey.jobKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
+        scheduler.triggerJob(jobKey);
+    }
+
+    /**
+     * 更新job时间表达式
+     *
+     * @param scheduleJob
+     * @throws SchedulerException
+     */
+    public void updateJobCron(ScheduleJob scheduleJob) throws SchedulerException {
+        TriggerKey triggerKey = TriggerKey.triggerKey(scheduleJob.getJobName(), scheduleJob.getJobGroup());
+        CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(scheduleJob.getCronExpression());
+        trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+        scheduler.rescheduleJob(triggerKey, trigger);
+    }
+
+    /**
+     * 更改任务状态
+     *
+     * @throws SchedulerException
+     */
+    public void changeStatus(String jobId, String status) throws SchedulerException {
+        ScheduleJob job = scheduleJob(jobId);
+        if (job == null) {
+            return;
+        }
+        switch (status) {
+            case "0":
+                pauseJob(job);
+                break;
+            case "1":
+                resumeJob(job);
+                break;
+            case "2":
+                deleteJob(job);
+                break;
+            default:
+                break;
+        }
+    }
 
 }
