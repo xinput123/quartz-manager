@@ -4,10 +4,7 @@ import com.xinput.entity.ScheduleJob;
 import com.xinput.service.ScheduleJobService;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +17,23 @@ public class ScheduleController {
 
     @Autowired
     private ScheduleJobService scheduleJobService;
+
+    /**
+     * 增加任务
+     *
+     * @return
+     */
+    @RequestMapping(value = "/scheduleJobs", method = RequestMethod.POST)
+    public void scheduleJobs(@RequestBody ScheduleJob job) {
+        //1、保存到数据库
+
+        // 2、
+        try {
+            scheduleJobService.addJob(job);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 查询所有任务
